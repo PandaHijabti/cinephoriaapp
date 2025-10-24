@@ -1,0 +1,17 @@
+<div class="container py-4" *ngIf="film; else notFound">
+  <h2 class="mb-2">{{ film.title }}</h2>
+  <img [src]="film.poster" class="img-fluid rounded my-3" alt="{{ film.title }}">
+  <p class="text-muted mb-2">{{ film.year }} · ⭐ {{ film.rating }}</p>
+
+<a class="btn btn-primary me-2"
+   [routerLink]="['/reservation']"
+   [queryParams]="{ filmId: film.id }">
+  Réserver ce film
+</a>
+<a class="btn btn-outline-secondary" routerLink="/films">⬅ Retour à la liste</a>
+
+</div>
+
+<ng-template #notFound>
+  <div class="text-center text-muted py-5">Film introuvable 😢</div>
+</ng-template>

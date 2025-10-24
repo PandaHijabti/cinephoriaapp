@@ -1,0 +1,40 @@
+.container {
+  color: #f1f4f9; /* texte clair global */
+}
+
+h2 {
+  color: #ffffff;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+p {
+  color: #cdd6e5; /* gris clair lisible */
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+
+  strong {
+    color: #ffffff; /* labels en blanc pour contraste */
+  }
+}
+
+img {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-outline-secondary {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #e8ecf1;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+}
+
+.text-muted {
+  color: #a5b1c2 !important;
+}
+
