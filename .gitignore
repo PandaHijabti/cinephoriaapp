@@ -1,0 +1,18 @@
+﻿# Global
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+.cache/
+tmp/
+npm-debug.log*
+
+# Sous-projet front Angular
+frontend/cinephoria-web/node_modules/
+frontend/cinephoria-web/dist/

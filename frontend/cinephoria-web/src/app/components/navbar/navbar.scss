@@ -1,0 +1,21 @@
+.navbar {
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.nav-link {
+  color: #cfd6e4;
+  &.active, &:hover { color: #fff; }
+}
+
+.btn-outline-light {
+  border-color: rgba(255,255,255,.35);
+  color: #e8ecf1;
+  &:hover { background: rgba(255,255,255,.12); }
+}
