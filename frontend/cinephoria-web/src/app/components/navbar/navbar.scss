@@ -1,0 +1,64 @@
+/* Palette */
+:root {
+  --bg-0: #0e0f13;
+  --bg-1: rgba(255,255,255,0.06);
+  --fg-0: #e6e7ee;
+  --fg-1: #c9cfdb;
+  --brand: #ff5bbd; /* rose néon */
+  --brand-2: #ff8cd1;
+}
+
+.app-header {
+  position: sticky; top: 0; z-index: 40;
+  background: linear-gradient(180deg, rgba(14,15,19,.95), rgba(14,15,19,.75));
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.nav {
+  max-width: 1200px; margin: 0 auto; padding: 12px 20px;
+  display: grid;
+  grid-template-columns: auto auto 1fr; /* brand | login | menu */
+  align-items: center; gap: 16px;
+}
+
+.brand {
+  color: var(--fg-0); text-decoration: none; font-weight: 800; font-size: 20px;
+  letter-spacing: .2px;
+}
+
+.menu {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; justify-content: flex-end; align-items: center; gap: 22px;
+}
+
+.menu a {
+  color: var(--fg-1); text-decoration: none; padding: 8px 10px; border-radius: 10px;
+  transition: all .2s ease;
+}
+.menu a:hover, .menu .active {
+  color: var(--fg-0); background: var(--bg-1);
+}
+
+/* Boutons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 36px; padding: 0 16px; border-radius: 999px; font-weight: 700;
+  text-decoration: none; border: 1px solid transparent; cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.btn-primary {
+  color: #fff; /* ✅ texte blanc visible */
+  background: var(--brand);
+  border-color: var(--brand-2);
+  font-weight: 600;
+  box-shadow: 0 0 14px rgba(255, 91, 189, .45);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4); /* petit effet lumineux */
+}
+
+.btn-primary:hover {
+  background: #ff6bc2; /* rose un peu plus clair au survol */
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(255, 91, 189, .55);
+}

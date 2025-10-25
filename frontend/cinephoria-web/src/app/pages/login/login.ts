@@ -1,45 +1,46 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms'; 
+import { Component, inject } from '@angular/core';
 import { NgIf } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, NgIf],
+  selector: 'app-login',
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
+  imports: [FormsModule, NgIf],
 })
 export class LoginComponent {
+  private router = inject(Router);
+  private auth = inject(AuthService);
+
   email = '';
   password = '';
   error = '';
   successMessage = '';
 
-  constructor(private router: Router) {}
-
   ngOnInit() {
-    // ✅ Vérifie si déjà connecté
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
-    if (isLoggedIn === 'true') {
+    // ✅ Ne pas utiliser localStorage ici (SSR) :
+    if (this.auth.isLoggedIn()) {
       this.router.navigate(['/films']);
     }
   }
 
+  onLogin() {
+    this.auth.login();              // ✅ persistance gérée dans AuthService
+    this.router.navigate(['/films']);
+  }
+
   onSubmit() {
     if (this.email === 'admin@mail.com' && this.password === '1234') {
-      // ✅ Simulation d'une connexion réussie
-      localStorage.setItem('isLoggedIn', 'true');
-      this.successMessage = 'Bienvenue, Admin 🎉';
-
-      // Attendre 2 secondes avant la redirection
-      setTimeout(() => {
-        this.router.navigate(['/films']);
-      }, 2000);
+      this.auth.login();            // ✅ au lieu de localStorage.setItem
+      this.successMessage = 'Bienvenue, Admin 🎬';
+      setTimeout(() => this.router.navigate(['/films']), 1000);
     } else {
-      // ❌ Sinon, afficher une erreur
       this.error = 'Email ou mot de passe incorrect.';
       this.successMessage = '';
     }
   }
 }
+

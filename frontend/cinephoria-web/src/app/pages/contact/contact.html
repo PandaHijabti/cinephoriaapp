@@ -1,0 +1,50 @@
+<section class="contact">
+  <h1>Contact</h1>
+  <p class="subtitle">Une question sur Cinéphoria ? Écris-nous ✨</p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <!-- honeypot anti-spam -->
+    <input type="text" formControlName="website" class="honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <div class="grid">
+      <div class="field">
+        <label for="name">Nom</label>
+        <input id="name" type="text" formControlName="name" placeholder="Ton nom">
+        <small class="err" *ngIf="f.name.touched && f.name.invalid">2 caractères minimum.</small>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" placeholder="ton@email.com">
+        <small class="err" *ngIf="f.email.touched && f.email.invalid">Email invalide.</small>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="subject">Sujet</label>
+      <input id="subject" type="text" formControlName="subject" placeholder="Sujet du message">
+      <small class="err" *ngIf="f.subject.touched && f.subject.invalid">3 caractères minimum.</small>
+    </div>
+
+    <div class="field">
+      <label for="message">Message</label>
+      <textarea id="message" rows="6" formControlName="message" placeholder="Écris ton message ici…"></textarea>
+      <small class="err" *ngIf="f.message.touched && f.message.invalid">10 caractères minimum.</small>
+    </div>
+
+    <label class="check">
+      <input type="checkbox" formControlName="agree">
+      <span>J’accepte que mes informations soient utilisées pour me répondre.</span>
+    </label>
+    <small class="err" *ngIf="f.agree.touched && f.agree.invalid">Tu dois accepter.</small>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="submit" [disabled]="sending">
+        {{ sending ? 'Envoi…' : 'Envoyer' }}
+      </button>
+    </div>
+
+    <p class="ok" *ngIf="success">{{ success }}</p>
+    <p class="err" *ngIf="error">{{ error }}</p>
+  </form>
+</section>

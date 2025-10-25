@@ -8,4 +8,4 @@ import { RouterLink, RouterLinkActive } from "@angular/router";
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.scss'],
 })
-export class Navbar {}
+export class NavbarComponent {}
