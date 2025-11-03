@@ -1,10 +1,15 @@
-# Cinéphoria — Starter Monorepo
+# 🎬 Cinéphoria
+Application de gestion de films et de réservations cinéma, réalisée avec **Angular** et **Express / TypeScript**.
 
-Ce dépôt contient un **starter** pour ton TP *Cinéphoria* :
-- `backend/` : API Node.js/Express/TypeScript (sécurité de base déjà câblée)
-- `db/sql/` : schéma SQL + exemple de **transaction** (réservation)
-- `frontend/` : instructions pour créer le projet Angular et implémenter l’US1 (navbar)
-- `mobile/` : piste Ionic Angular
-- `desktop/` : piste Electron
-- `docs/` : notes (sécurité, tests, déploiement, plan de travail)
+## Fonctionnalités
+- Authentification avec JWT
+- Liste des films dynamique
+- Page de réservation protégée
+- Design sombre moderne
 
+## Démarrage rapide
+### Backend
+```bash
+cd backend
+npm install
+npm run dev

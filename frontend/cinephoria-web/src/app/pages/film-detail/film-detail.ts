@@ -1,24 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { RouterLink } from '@angular/router';
-import { FilmService, Film } from '../../services/film.service';
+import { FilmService, type Film } from '../../services/film.service';
+import { StarRatingComponent } from '../../components/star-rating/star-rating';
 
 @Component({
-  selector: 'app-film-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './film-detail.html',
-  styleUrls: ['./film-detail.scss'],
+  selector: 'app-film-detail',
+  imports: [CommonModule,StarRatingComponent],
+  templateUrl: './film-detail.html'
 })
 export class FilmDetailComponent {
-  film?: Film;
+  private route = inject(ActivatedRoute);
+  private api = inject(FilmService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private filmService: FilmService
-  ) {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.film = this.filmService.getById(id);
+  film: Film | null = null;
+
+  ngOnInit(){
+    const id = String(this.route.snapshot.paramMap.get('id') ?? '');
+    this.api.getById(id).subscribe(f => this.film = f);
   }
 }
+

@@ -1,122 +1,63 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
-import { NgClass } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { FilmService, Film } from '../../services/film.service';
-
-type Booking = {
-  filmId: number | null;
-  date: string;
-  time: string | null;
-  seats: number | null;
-  name: string;
-  email: string;
-};
+import { FilmService, type Film } from '../../services/film.service';
+import { ShowtimeService, type Showtime } from '../../services/showtime.service';
 
 @Component({
-  selector: 'app-reservation',
   standalone: true,
-  imports: [FormsModule, NgFor, NgIf, NgClass],
-  templateUrl: './reservation.html',
-  styleUrls: ['./reservation.scss'],
+  selector: 'app-reservation',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './reservation.html'
 })
 export class ReservationComponent {
+  private filmsApi = inject(FilmService);
+  private showApi  = inject(ShowtimeService);
+
   films: Film[] = [];
+  showtimes: Showtime[] = [];
+  dates: string[] = [];
+  filtered: Showtime[] = [];
+  seats: { seat:number; taken:boolean; accessible:boolean }[] = [];
 
-  // 🔽 options dynamiques
-  availableDates: string[] = [];
-  availableTimes: string[] = [];
-
-  form: Booking = {
-    filmId: null,
-    date: '',
-    time: null,
-    seats: null,
-    name: '',
-    email: ''
+  form = {
+    filmId: '' as string,
+    date: '' as string,
+    showtimeId: '' as string,
+    selectedSeats: [] as number[]
   };
 
-  submitted = false;
-  confirmationMsg = '';
-
-  constructor(
-    private filmService: FilmService,
-    private route: ActivatedRoute
-  ) {
-    this.films = this.filmService.getAll();
-
-    // Pré-sélection depuis film-detail ? /reservation?filmId=2
-    const filmIdParam = Number(this.route.snapshot.queryParamMap.get('filmId'));
-    if (filmIdParam) {
-      this.form.filmId = filmIdParam;
-      this.refreshDates();
-    }
-  }
-
-  private refreshDates() {
-    if (!this.form.filmId) {
-      this.availableDates = [];
-      this.availableTimes = [];
-      this.form.date = '';
-      this.form.time = null;
-      return;
-    }
-    this.availableDates = this.filmService.getShowDates(this.form.filmId);
-    if (!this.availableDates.includes(this.form.date)) {
-      this.form.date = '';
-      this.availableTimes = [];
-      this.form.time = null;
-    } else {
-      this.refreshTimes();
-    }
+  ngOnInit() {
+    this.filmsApi.getAll().subscribe(f => this.films = f);
   }
 
   onFilmChange() {
-    this.refreshDates();
+    this.form.date = '';
+    this.form.showtimeId = '';
+    this.seats = [];
+    this.showApi.search({ filmId: this.form.filmId }).subscribe(sts => {
+      this.showtimes = sts;
+      this.dates = Array.from(new Set(sts.map(s => s.start.slice(0,10)))).sort();
+      this.filtered = [];
+    });
   }
 
   onDateChange() {
-    this.refreshTimes();
+    this.form.showtimeId = '';
+    this.seats = [];
+    this.filtered = this.showtimes.filter(s => s.start.slice(0,10) === this.form.date);
   }
 
-  private refreshTimes() {
-    if (!this.form.filmId || !this.form.date) {
-      this.availableTimes = [];
-      this.form.time = null;
-      return;
-    }
-    this.availableTimes = this.filmService.getShowTimes(this.form.filmId, this.form.date);
-    if (!this.availableTimes.includes(this.form.time || '')) {
-      this.form.time = null;
-    }
+  onShowtimeChange() {
+    this.seats = [];
+    if (!this.form.showtimeId) return;
+    this.showApi.seats(this.form.showtimeId).subscribe(r => this.seats = r.seats);
   }
 
-  isEmailValid(email: string | null | undefined): boolean {
-    if (!email) return false;
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  get isValid(): boolean {
-    return !!this.form.filmId
-      && !!this.form.date
-      && !!this.form.time
-      && !!this.form.seats && this.form.seats > 0
-      && !!this.form.name.trim()
-      && this.isEmailValid(this.form.email);
-  }
-
-  submit() {
-    this.submitted = true;
-    if (!this.isValid) return;
-
-    const film = this.films.find(f => f.id === this.form.filmId);
-    this.confirmationMsg =
-      `🎟️ Réservation confirmée : ${film?.title} · ${this.form.date} à ${this.form.time} · ${this.form.seats} place(s)`;
-
-    this.form = { filmId: this.form.filmId, date: '', time: null, seats: null, name: '', email: '' };
-    this.availableTimes = [];
-    this.submitted = false;
+  toggleSeat(n: number) {
+    this.form.selectedSeats = this.form.selectedSeats.includes(n)
+      ? this.form.selectedSeats.filter(x => x !== n)
+      : [...this.form.selectedSeats, n];
   }
 }
 

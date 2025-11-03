@@ -1,0 +1,12 @@
+{
+  "name": "cinephoria-starter",
+  "private": true,
+  "scripts": {
+    "dev:api": "npm run dev --prefix backend",
+    "dev:front": "npm start --prefix frontend/cinephoria-web",
+    "dev:all": "concurrently -n API,FRONT -c magenta,blue \"npm:dev:api\" \"npm:dev:front\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

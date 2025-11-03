@@ -1,39 +1,62 @@
+// backend/src/app.ts
+import 'dotenv/config';
 import express from "express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import authRoutes from "./routes/auth.js";
-import moviesRoutes from "./routes/movies.js";
+
+// 🧩 Import des routes (en .ts, donc pas besoin de .js)
+import authRoutes from "./routes/auth";
+import moviesRoutes from "./routes/movies";
+import cinemasRoutes from "./routes/cinemas";
+import filmsRoutes from "./routes/movies";
+import showtimesRoutes from "./routes/showtimes";
+import reservationsRoutes from "./routes/reservations";
 
 const app = express();
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    useDefaults: true,
-    directives: {
-      "default-src": ["'self'"],
-      "img-src": ["'self'", "data:"],
-      "connect-src": ["'self'"],
+// Sécurité : Helmet
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "img-src": ["'self'", "data:"],
+        "connect-src": ["'self'"],
+      },
     },
-  },
-}));
+  })
+);
 
+// Middlewares
 app.use(express.json({ limit: "200kb" }));
 app.use(cookieParser());
 
-const allowed = process.env.CORS_ORIGIN?.split(",").map(s => s.trim()).filter(Boolean) || ["http://localhost:4200"];
-app.use(cors({ origin: allowed, credentials: true }));
+// CORS : autoriser ton frontend Angular
+const allowed = (process.env.CORS_Origin?? 'http://localhost:4200').split(',').map(s => s.trim());
+app.use(cors({origin: allowed, credentials: true}));
 
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200 });
+// Limiteur de requêtes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+});
 app.use(limiter);
 
-// Healthcheck
-app.get("/health", (_req, res) => res.json({ ok: true }));
+// Test rapide
+app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
-// API routes
+// Routes API
 app.use("/api/auth", authRoutes);
 app.use("/api/movies", moviesRoutes);
+app.use("/api/cinemas", cinemasRoutes);
+app.use("/api/films", filmsRoutes);
+app.use("/api/showtimes", showtimesRoutes);
+app.use("/api/reservations", reservationsRoutes);
 
-export default app;
+// Lancement du serveur
+const port = Number(process.env.PORT) || 4000;
+app.listen(port, () => console.log(`[backend] listening on port ${port}`));

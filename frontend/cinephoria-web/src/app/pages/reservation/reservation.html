@@ -1,99 +1,51 @@
-<div class="container py-4">
-  <h2 class="reservation-title text-center mb-4">🎟️ Réservation de séance</h2>
-  <p class="text-center text-muted mb-4">Choisis un film, une date et un horaire.</p>
+<h1 class="mb-3">Réservation</h1>
 
-  <form (ngSubmit)="submit()" class="card p-3 shadow-sm reservation-card">
-
-    <!-- Film -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Film</label>
-      <select class="form-select"
-              name="filmId"
-              [(ngModel)]="form.filmId"
-              (ngModelChange)="onFilmChange()"
-              [ngClass]="{'is-invalid': submitted && !form.filmId}">
-        <option [ngValue]="null">— Sélectionner —</option>
-        <option *ngFor="let film of films" [ngValue]="film.id">{{ film.title }}</option>
+<div class="card card-dark p-3 mb-3">
+  <div class="row g-3">
+    <div class="col-sm-6 col-lg-4">
+      <label class="form-label">Film</label>
+      <select class="form-select" [(ngModel)]="form.filmId" (change)="onFilmChange()">
+        <option [ngValue]="''" disabled>-- choisir --</option>
+        <option *ngFor="let f of films" [ngValue]="f.id">{{ f.title }} ({{ f.year }})</option>
       </select>
-      <div class="invalid-feedback">Sélectionne un film.</div>
     </div>
+    <div class="d-flex align-items-center gap-3 mt-3" style="color:var(--muted)">
+  <span><span style="display:inline-block;width:14px;height:14px;background:#0f1830;border:1px solid var(--border);border-radius:4px;margin-right:6px"></span>Libre</span>
+  <span><span style="display:inline-block;width:14px;height:14px;background:#112347;border:1px solid var(--border);border-radius:4px;margin-right:6px"></span>Choisi</span>
+  <span><span style="display:inline-block;width:14px;height:14px;background:#0f1830;border:1px solid var(--border);border-radius:4px;opacity:.45;margin-right:6px"></span>Occupé</span>
+</div>
 
-    <!-- Date (proposée par le cinéma) -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Date de séance</label>
-      <select class="form-select"
-              name="date"
-              [(ngModel)]="form.date"
-              (ngModelChange)="onDateChange()"
-              [disabled]="availableDates.length === 0"
-              [ngClass]="{'is-invalid': submitted && !form.date}">
-        <option value="" disabled selected>— Choisir une date —</option>
-        <option *ngFor="let d of availableDates" [value]="d">{{ d }}</option>
+
+    <div class="col-sm-6 col-lg-4" *ngIf="dates.length">
+      <label class="form-label">Date</label>
+      <select class="form-select" [(ngModel)]="form.date" (change)="onDateChange()">
+        <option [ngValue]="''" disabled>-- choisir --</option>
+        <option *ngFor="let d of dates" [ngValue]="d">{{ d }}</option>
       </select>
-      <div class="invalid-feedback">Choisis une date.</div>
     </div>
 
-    <!-- Horaire -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Horaire</label>
-      <select class="form-select"
-              name="time"
-              [(ngModel)]="form.time"
-              [disabled]="availableTimes.length === 0"
-              [ngClass]="{'is-invalid': submitted && !form.time}">
-        <option [ngValue]="null">— Choisir un horaire —</option>
-        <option *ngFor="let t of availableTimes" [ngValue]="t">{{ t }}</option>
+    <div class="col-lg-4" *ngIf="filtered.length">
+      <label class="form-label">Séance</label>
+      <select class="form-select" [(ngModel)]="form.showtimeId" (change)="onShowtimeChange()">
+        <option [ngValue]="''" disabled>-- choisir --</option>
+        <option *ngFor="let s of filtered" [ngValue]="s.id">
+          {{ s.start | date:'shortTime' }} — {{ s.quality }} — {{ s.room.name }} — {{ s.price }}€
+        </option>
       </select>
-      <div class="invalid-feedback">Choisis un horaire.</div>
     </div>
+  </div>
+</div>
 
-    <!-- Places -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Nombre de places</label>
-      <input type="number"
-             min="1"
-             class="form-control"
-             name="seats"
-             [(ngModel)]="form.seats"
-             [ngClass]="{'is-invalid': submitted && (!form.seats || form.seats <= 0)}">
-      <div class="invalid-feedback">Indique au moins 1 place.</div>
-    </div>
-
-    <!-- Identité -->
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Nom et prénom</label>
-        <input type="text"
-               class="form-control"
-               name="name"
-               [(ngModel)]="form.name"
-               [ngClass]="{'is-invalid': submitted && !form.name.trim()}">
-        <div class="invalid-feedback">Ton nom est requis.</div>
-      </div>
-      <div class="col-md-6">
-        <label class="form-label fw-semibold">Email</label>
-        <input type="email"
-               class="form-control"
-               name="email"
-               [(ngModel)]="form.email"
-               [ngClass]="{'is-invalid': submitted && !isEmailValid(form.email)}">
-        <div class="invalid-feedback">Email invalide.</div>
-      </div>
-    </div>
-
-    <div class="d-flex gap-2 mt-4">
-      <button type="submit" class="btn btn-primary" [disabled]="!isValid">
-        <i class="bi bi-check2-circle me-1"></i> Valider la réservation
-      </button>
-      <button type="button" class="btn btn-outline-secondary"
-              (click)="form={filmId: form.filmId,date:'',time:null,seats:null,name:'',email:''}; availableTimes=[]; submitted=false;">
-        Réinitialiser
-      </button>
-    </div>
-  </form>
-
-  <div *ngIf="confirmationMsg" class="alert alert-success mt-3">
-    {{ confirmationMsg }}
+<div *ngIf="seats.length" class="card card-dark p-3">
+  <h5 class="mb-3">Choix des sièges</h5>
+  <div class="seat-grid">
+    <button type="button"
+            *ngFor="let s of seats"
+            [disabled]="s.taken"
+            [class.selected]="form.selectedSeats.includes(s.seat)"
+            (click)="toggleSeat(s.seat)">
+      {{ s.seat }}
+    </button>
   </div>
 </div>
 

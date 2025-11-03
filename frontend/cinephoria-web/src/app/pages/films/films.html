@@ -1,35 +1,37 @@
-<div class="container py-4">
-  <div class="d-flex flex-wrap gap-3 align-items-end mb-4">
-    <div class="flex-grow-1">
-      <label class="form-label fw-semibold">Recherche</label>
-      <input class="form-control" [(ngModel)]="query" placeholder="Titre du film..." />
-    </div>
-    <div style="min-width: 200px;">
-      <label class="form-label fw-semibold">Note minimale</label>
-      <select class="form-select" [(ngModel)]="minRating">
-        <option [ngValue]="0">Toutes</option>
-        <option [ngValue]="6">≥ 6</option>
-        <option [ngValue]="7">≥ 7</option>
-        <option [ngValue]="8">≥ 8</option>
-        <option [ngValue]="9">≥ 9</option>
-      </select>
-    </div>
-  </div>
+<h1 class="mb-3">À l'affiche</h1>
 
-  <div class="row g-3">
-    <div class="col-6 col-md-4 col-lg-3" *ngFor="let film of filtered">
-      <div class="card h-100 shadow-sm">
-        <img [src]="film.poster" [alt]="film.title" class="card-img-top object-fit-cover" height="360" />
-        <div class="card-body">
-          <h6 class="card-title mb-1 text-truncate">{{ film.title }}</h6>
-          <p class="text-muted mb-2">{{ film.year }} · ⭐ {{ film.rating }}</p>
-          <button class="btn btn-outline-primary w-100">Détails</button>
-        </div>
-      </div>
+<!-- Skeleton state -->
+<div *ngIf="!films.length" class="row g-3">
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="card-dark p-3">
+      <div class="poster skeleton"></div>
+      <div class="skeleton" style="height:18px; border-radius:6px; margin:12px 0 8px"></div>
+      <div class="skeleton" style="height:14px; border-radius:6px; width:70%"></div>
     </div>
   </div>
-  <div *ngIf="filtered.length === 0" class="text-center text-muted py-5">
-    Aucun film ne correspond à ta recherche.
+</div>
+
+<!-- Films grid -->
+<div class="row g-3" *ngIf="films.length">
+  <div *ngFor="let film of films" class="col-12 col-sm-6 col-lg-4">
+    <a [routerLink]="['/film', film.id]" class="card-dark d-block p-3 h-100">
+      <img class="poster mb-3 w-100 rounded" [src]="film.poster || 'assets/placeholder-poster.jpg'" [alt]="film.title" />
+      <h5 class="mb-1" style="color:var(--text)">{{ film.title }}</h5>
+
+      <div class="d-flex align-items-center gap-2 text-muted mb-2">
+        <span>{{ film.year }}</span>
+        <span>·</span>
+        <app-star-rating [value]="film.rating"></app-star-rating>
+      </div>
+
+      <div class="d-flex gap-1 flex-wrap mb-2">
+        <span *ngFor="let g of film.genres" class="badge badge-soft">{{ g }}</span>
+      </div>
+
+      <p class="mb-0" style="line-height:1.45; color:var(--muted)">
+        {{ film.description }}
+      </p>
+    </a>
   </div>
 </div>
 

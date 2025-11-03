@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -7,40 +7,42 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   standalone: true,
   selector: 'app-login',
-  templateUrl: './login.html',
-  styleUrls: ['./login.scss'],
-  imports: [FormsModule, NgIf],
+  imports: [CommonModule, FormsModule],
+  templateUrl: './login.html'
 })
 export class LoginComponent {
-  private router = inject(Router);
   private auth = inject(AuthService);
+  private router = inject(Router);
 
   email = '';
   password = '';
+  mode: 'login'|'signup' = 'login';
   error = '';
-  successMessage = '';
 
-  ngOnInit() {
-    // ✅ Ne pas utiliser localStorage ici (SSR) :
-    if (this.auth.isLoggedIn()) {
-      this.router.navigate(['/films']);
+  async submit() {
+    this.error = '';
+    const payload = { email: this.email.trim(), password: this.password };
+    try {
+      if (this.mode === 'login') {
+        const r = await this.auth.login(payload).toPromise();
+        this.auth.isLoggedIn.set(true);
+        this.auth.role.set(r?.role ?? 'USER');
+      } else {
+        const r = await this.auth.signup({ ...payload, role: 'USER' }).toPromise();
+        this.auth.isLoggedIn.set(true);
+        this.auth.role.set(r?.role ?? 'USER');
+      }
+      this.router.navigate(['/reservation']);
+    } catch (e) {
+      this.error = 'Identifiants invalides.';
     }
   }
 
-  onLogin() {
-    this.auth.login();              // ✅ persistance gérée dans AuthService
-    this.router.navigate(['/films']);
-  }
-
-  onSubmit() {
-    if (this.email === 'admin@mail.com' && this.password === '1234') {
-      this.auth.login();            // ✅ au lieu de localStorage.setItem
-      this.successMessage = 'Bienvenue, Admin 🎬';
-      setTimeout(() => this.router.navigate(['/films']), 1000);
-    } else {
-      this.error = 'Email ou mot de passe incorrect.';
-      this.successMessage = '';
-    }
+  async logout() {
+    await this.auth.logout().toPromise();
+    this.auth.isLoggedIn.set(false);
+    this.auth.role.set(null);
   }
 }
+
 
